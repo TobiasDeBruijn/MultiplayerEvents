@@ -1,1 +1,17 @@
-#Empty configuration file. you should add stuff here yourself or remove it :)
+#How often should events occur
+eventIntervalLowerBound: 300
+eventIntervalUpperBound: 600
+
+#EventMobKill
+eventMobKillEnabled: true
+eventMobKillExclude:
+- ender_dragon
+- wither
+- wandering_trader
+- skeleton_horse
+- elder_guardian
+eventMobKillHostileOnly: false
+eventMobKillCountLowerBound: 5
+eventMobKillCountUpperBound: 20
+
+#
