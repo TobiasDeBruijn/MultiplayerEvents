@@ -1,4 +1,5 @@
 #How often should events occur
+#Time in seconds
 eventIntervalLowerBound: 300
 eventIntervalUpperBound: 600
 
@@ -12,6 +13,14 @@ eventMobKillExclude:
 - elder_guardian
 eventMobKillHostileOnly: false
 eventMobKillCountLowerBound: 5
-eventMobKillCountUpperBound: 20
+eventMobKillCountUpperBound: 10
 
-#
+#EventMoveToLocation
+eventMoveToLocationEnabled: true
+eventMoveToLocationEnableMobs: true
+eventMoveToLocationDistanceLowerBound: 400
+eventMoveToLocationDistanceUpperBound: 1000
+eventMoveToLocationFinishRadius: 10
+eventMoveToLocationFinishShowParticles: true
+eventMoveToLocationDurationLowerBound: 300
+eventMoveToLocationDurationUpperBound: 900

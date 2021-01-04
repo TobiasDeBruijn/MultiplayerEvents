@@ -2,13 +2,15 @@ package nl.thedutchmc.multiplayerevents;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import nl.thedutchmc.multiplayerevents.eventmanager.EventRegister;
-import nl.thedutchmc.multiplayerevents.eventmanager.EventScheduler;
+import nl.thedutchmc.multiplayerevents.events.EventRegister;
+import nl.thedutchmc.multiplayerevents.events.EventScheduler;
 
 public class MultiplayerEvents extends JavaPlugin {
 
 	public static boolean DEBUG = true;
 	private static EventRegister eventRegister;
+	private static EventScheduler eventScheduler;
+
 	private static MultiplayerEvents INSTANCE;
 	
 	@Override
@@ -22,7 +24,7 @@ public class MultiplayerEvents extends JavaPlugin {
 		eventRegister = new EventRegister(this);
 		eventRegister.registerDefaultEvents();
 		
-		new EventScheduler(this);
+		eventScheduler = new EventScheduler(this);
 	}
 	
 	@Override
@@ -32,6 +34,10 @@ public class MultiplayerEvents extends JavaPlugin {
 	
 	public static EventRegister getEventRegister() {
 		return eventRegister;
+	}
+	
+	public EventScheduler getEventScheduler() {
+		return eventScheduler;
 	}
 	
 	public static void logDebug(String log) {

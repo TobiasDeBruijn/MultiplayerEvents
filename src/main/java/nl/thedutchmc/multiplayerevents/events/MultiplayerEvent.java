@@ -1,4 +1,4 @@
-package nl.thedutchmc.multiplayerevents.eventmanager;
+package nl.thedutchmc.multiplayerevents.events;
 
 public interface MultiplayerEvent {
 
