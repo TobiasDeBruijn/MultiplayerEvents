@@ -24,6 +24,7 @@ import nl.thedutchmc.multiplayerevents.events.EventScheduler;
 import nl.thedutchmc.multiplayerevents.events.EventState;
 import nl.thedutchmc.multiplayerevents.events.MultiplayerEvent;
 import nl.thedutchmc.multiplayerevents.events.eventmovetolocation.listeners.PlayerMoveEventListener;
+import nl.thedutchmc.multiplayerevents.lang.LanguageHandler;
 
 /**
  * This event will challenge the player to move to a location as fast as possible
@@ -39,7 +40,7 @@ public class EventMoveToLocation implements MultiplayerEvent {
 	private int distanceLowerBound, distanceUpperBound, finishRadius, durationLowerBound, durationUpperBound;
 	private List<String> mobWhitelist;
 	
-	private final int particleHeight = 5;
+	private final int particleHeight = 15;
 	
 	private HashMap<UUID, Location> finishLocations = new HashMap<>();
 	private HashMap<UUID, BukkitTask> particleTasks = new HashMap<>();
@@ -65,11 +66,10 @@ public class EventMoveToLocation implements MultiplayerEvent {
 	}
 	
 	@Override
-	public boolean fireEvent() {
-		scheduler.setEventState(EventState.RUNNING);
-		
+	public boolean fireEvent() {		
 		int eventDuration = Utils.getRandomInt(durationLowerBound, durationUpperBound);
-		MultiplayerEvents.logInfo("Starting event: MoveToLocation");
+		MultiplayerEvents.logInfo(LanguageHandler.getLangValue("startingEventLog")
+				.replace("%EVENT_NAME%", "MoveToLocation"));
 		
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			
@@ -125,14 +125,17 @@ public class EventMoveToLocation implements MultiplayerEvent {
 							}
 						}
 					}
-				}.runTaskTimer(plugin, 60L, 30L * 20L); //Spawn the particle every 30 seconds
+				}.runTaskTimer(plugin, 60L, 10L); //Spawn the particle every 10 ticks (0.5 second)
 				
 				particleTasks.put(player.getUniqueId(), particleTask);
 			}
 			
 			//Inform the player about this event
-			//TODO mutli language
-			player.sendMessage(ChatColor.GOLD + "Event starting now: move to " + ChatColor.RED + finishCircleCX + ", " + finishCircleCZ + ChatColor.GOLD + " as fast as possible! You have " + ChatColor.RED + eventDuration + ChatColor.GOLD + " seconds!");
+			player.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationStarting")
+					.replace("%LOCATION_X%", String.valueOf(finishCircleCX))
+					.replace("%LOCATION_Z%", String.valueOf(finishCircleCZ))
+					.replace("%EVENT_DURATION%", String.valueOf(eventDuration)));
+			//player.sendMessage(ChatColor.GOLD + "Event starting now: move to " + ChatColor.RED + finishCircleCX + ", " + finishCircleCZ + ChatColor.GOLD + " as fast as possible! You have " + ChatColor.RED + eventDuration + ChatColor.GOLD + " seconds!");
 		}
 		
 		//Register event listeners
@@ -141,12 +144,18 @@ public class EventMoveToLocation implements MultiplayerEvent {
 		
 		//TODO spawn monsters
 		
+		//We put this at the end, in case an error occurs during the starting of the MultiplayerEvent
+		scheduler.setEventState(EventState.RUNNING);
+		
 		//Schedule a task for the event end
 		new BukkitRunnable() {
 			
 			@Override
 			public void run() {
 				scheduler.setEventState(EventState.ENDING);
+				
+				MultiplayerEvents.logDebug(LanguageHandler.getLangValue("endingEventLog")
+						.replace("%EVENT_NAME%", "MoveToLocation"));
 				
 				//Cancel all particle tasks
 				particleTasks.forEach((uuid, task) -> {
@@ -157,25 +166,29 @@ public class EventMoveToLocation implements MultiplayerEvent {
 				HandlerList.unregisterAll(pmeListener);
 				
 				//Inform all players that the event has ended, and tell the fast players
-				for(Player p : Bukkit.getOnlinePlayers()) {
-					//TODO multi language
-					
-					p.sendMessage(ChatColor.GOLD + "The event has ended.");
+				for(Player p : Bukkit.getOnlinePlayers()) {					
+					p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationEnded"));
 					
 					if(finishedPlayers.size() != 0) {
 						if(finishedPlayers.size() >= 1) {
-							p.sendMessage(ChatColor.GOLD + "- " + ChatColor.RED + finishedPlayers.get(0).getDisplayName() + ChatColor.GOLD + " won first!");
+							p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationFirstPlace")
+									.replace("%PLAYER%", finishedPlayers.get(0).getDisplayName())
+									.replace("%POINTS%", "")); //TODO points
 						}
 						
 						if(finishedPlayers.size() >= 2) {
-							p.sendMessage(ChatColor.GOLD + "- " + ChatColor.RED + finishedPlayers.get(1).getDisplayName() + ChatColor.GOLD + " won second!");
+							p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationFirstPlace")
+									.replace("%PLAYER%", finishedPlayers.get(1).getDisplayName())
+									.replace("%POINTS%", "")); //TODO points						
 						}
 						
 						if(finishedPlayers.size() >= 3) {
-							p.sendMessage(ChatColor.GOLD + "- " + ChatColor.RED + finishedPlayers.get(2).getDisplayName() + ChatColor.GOLD + " won third!");
+							p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationFirstPlace")
+									.replace("%PLAYER%", finishedPlayers.get(2).getDisplayName())
+									.replace("%POINTS%", "")); //TODO points						
 						}
 					} else {
-						p.sendMessage(ChatColor.GOLD + "No players finished.");
+						p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationNoFinish"));
 					}
 				}
 				
@@ -191,14 +204,15 @@ public class EventMoveToLocation implements MultiplayerEvent {
 	}
 	
 	public void playerFinished(Player p) {
-		finishedPlayers.add(p);
-		
-		//Cancel the particle task
-		particleTasks.get(p.getUniqueId()).cancel();
-		particleTasks.remove(p.getUniqueId());
-		
-		//Inform the player
-		//TODO multi language
-		p.sendMessage(ChatColor.GOLD + "You finished!");
+		if(!finishedPlayers.contains(p)) {
+			finishedPlayers.add(p);
+			
+			//Cancel the particle task
+			if(particleTasks.get(p.getUniqueId()) != null) particleTasks.get(p.getUniqueId()).cancel();
+			particleTasks.remove(p.getUniqueId());
+			
+			//Inform the player
+			p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationFinished"));
+		}
 	}
 }

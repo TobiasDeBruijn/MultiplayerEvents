@@ -16,6 +16,7 @@ public class Utils {
 	 * @return Returns a random Integer 
 	 */
 	public static int getRandomInt(int min, int max) {
+		max = max +1;
 		return (int) (Math.random() * (max - min) + min);
 	}
 	
@@ -60,7 +61,8 @@ public class Utils {
 				"series", 
 				"species", 
 				"deer", 
-				"moose"
+				"moose",
+				"drowned"
 			});
 		
 		//The following words are irregular nouns and have their own special way of pluralizing
@@ -83,12 +85,12 @@ public class Utils {
 			output += "'s";
 		
 		//If a word ends with s,ss,sh,ch,x,z we need to add `es` to it
-		} else if(input.matches("[s,ss,sh,ch,x,z]$/mi")) {
+		} else if(input.matches("s$|ss$|sh$|ch$|x$|z$/mi")) {
 			output += "es";
 			
 		//If a word ends with f,fe we need to replace that with `ve`, then add `s` to it
-		} else if(input.matches("[f,fe]$/mi")) {
-			output.replaceAll("[fe,f]$/mi", "ve");
+		} else if(input.matches("f$|fe$/mi")) {
+			output.replaceAll("$fe|$f/mi", "ve");
 			output += "s";
 			
 		} else if(input.matches("y$/mi")) {

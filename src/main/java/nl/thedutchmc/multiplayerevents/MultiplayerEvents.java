@@ -4,6 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import nl.thedutchmc.multiplayerevents.events.EventRegister;
 import nl.thedutchmc.multiplayerevents.events.EventScheduler;
+import nl.thedutchmc.multiplayerevents.lang.LanguageHandler;
 
 public class MultiplayerEvents extends JavaPlugin {
 
@@ -19,12 +20,15 @@ public class MultiplayerEvents extends JavaPlugin {
 		
 		ConfigurationHandler configHandler = new ConfigurationHandler(this);
 		configHandler.loadConfig();
-	
+
+		LanguageHandler langHandler = new LanguageHandler(this);
+		langHandler.loadConfig();
 		
+		eventScheduler = new EventScheduler(this);
+
 		eventRegister = new EventRegister(this);
 		eventRegister.registerDefaultEvents();
 		
-		eventScheduler = new EventScheduler(this);
 	}
 	
 	@Override

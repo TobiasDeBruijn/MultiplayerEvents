@@ -29,10 +29,17 @@ public class EventScheduler {
 		
 		//If an event is already running we do not want to start a new one
 		//so we just wait another cycle
-		if(eventState == EventState.RUNNING) {
-			scheduleNextEvent(delay);
+		if(eventState != EventState.WAITING) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					scheduleNextEvent(delay);
+				}
+			}.runTaskLater(plugin, delay * 20L);
+			
 			return;
 		}
+		
 		MultiplayerEvents.logDebug("Starting new event in " + delay + " seconds");
 		
 		new BukkitRunnable() {
@@ -47,7 +54,7 @@ public class EventScheduler {
 				int delay = Utils.getRandomInt(eventIntervalLowerBound, eventIntervalUpperBound);
 				scheduleNextEvent(delay);
 			}
-		}.runTaskLater(plugin, delay*20);
+		}.runTaskLater(plugin, delay * 20L);
 	}
 	
 	public void setEventState(EventState eventState) {

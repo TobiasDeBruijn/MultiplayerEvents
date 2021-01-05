@@ -1,26 +1,57 @@
-#How often should events occur
+# ---------------------
+# General Configuration
+# ---------------------
+#How often should events occur (int)
 #Time in seconds
 eventIntervalLowerBound: 300
 eventIntervalUpperBound: 600
+#Enable/disable debug mode. Enabling this will produce more log output (boolean)
+debugMode: false
+#What language should be used (string)
+#Note: If the file does not exist in {plugin folder}/MultiplayerEvents/languages/{language}.yml, MultiplayerEvents defaults to 'en.yml'
+language: "en"
 
-#EventMobKill
+# ------------
+# EventMobKill
+# ------------
+#Should this event be enabled (boolean)
 eventMobKillEnabled: true
-eventMobKillExclude:
+#Should any mobs be excluded from this event (string list)
+eventMobKillBlacklist:
 - ender_dragon
 - wither
 - wandering_trader
 - skeleton_horse
 - elder_guardian
+#Should we only use hostile mobs for this event (boolean)
 eventMobKillHostileOnly: false
+#How many mobs should be killed (int)
 eventMobKillCountLowerBound: 5
 eventMobKillCountUpperBound: 10
+#How long should this event last, in seconds (int)
+eventMobKillCountDurationLowerBound: 300
+eventMobKillCountDurationUpperBound: 900
 
-#EventMoveToLocation
+# -------------------
+# EventMoveToLocation
+# -------------------
+#Should this event be enabled (boolean)
 eventMoveToLocationEnabled: true
+#Should mobs be spawned to make it trickier for the player (boolean)
 eventMoveToLocationEnableMobs: true
+#What mobs should be spawned, if enabled (string list)
+eventMoveToLocationMobWhitelist:
+- "zombie"
+- "skeleton"
+- "spider"
+- "pillager"
+#How far away can the finish be, upper and lower bounds in blocks (int)
 eventMoveToLocationDistanceLowerBound: 400
 eventMoveToLocationDistanceUpperBound: 1000
+#How big is the finish circle radius (int)
 eventMoveToLocationFinishRadius: 10
+#Should we should particles around the finish (boolean)
 eventMoveToLocationFinishShowParticles: true
+#How long should this event last, in seconds (int)
 eventMoveToLocationDurationLowerBound: 300
 eventMoveToLocationDurationUpperBound: 900

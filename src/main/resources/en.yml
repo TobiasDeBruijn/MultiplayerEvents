@@ -1,0 +1,68 @@
+# Any option ending in 'Log' will be a message which is sent to the console.
+# Variables should NOT be translated, and put in EXACTLY like they are supposed to be, including the percentage symbols!
+# Not all variables work in all messages, only those that exist in the original English translation will work!  
+#
+# This file should be saved with UTF-8 encoding, otherwhise you might get weird character issues!
+#
+# General Variables:
+# %EVENT_DURATION%: The duration of the event
+#
+# The following color codes are supported:
+# &4: Dark Red (#AA0000)
+# &c: Red (#FF5555)
+# &6: Gold (#FFAA00)
+# &e: Yellow (#FFFF55)
+# &2: Dark Green (#00AA00)
+# &a: Green (#55FF55)
+# &b: Aqua (#55FFFF)
+# &3: Dark Aqua (#00AAAA)
+# &1: Dark Blue (#0000AA)
+# &9: Blue (#5555FF)
+# &d: Light Purple (#FF55FF)
+# &5: Dark Purple (#AA00AA)
+# &f: White (#FFFFFF)
+# &7: Gray (#AAAAAA)
+# &8: Dark Gray (#555555)
+# &0: Black (#000000)
+#
+# ----------------
+# General language
+# ----------------
+startingEventLog: "Starting event: %EVENT_NAME%"
+endingEventLog: "Ending event: %EVENT_NAME%"
+
+# ------------
+# EventMobKill
+# ------------
+# Message indicating the start of the event
+# %MOB_COUNT%: The amount of mob(s) that need to be killed
+# %MOB_NAME%: The name of the mob to be killed
+eventMobKillStarting: "&6Event starting now: Kill &c%MOB_COUNT% %MOB_NAME% &6within &c%EVENT_DURATION% &6seconds!"
+# Message indicating the end of the event
+# %MOB_KILL_COUNT%: The amount of mobs the player has killed
+eventMobKillEnded: "&6Event over! You have killed &c%MOB_KILL_COUNT% &6mobs."
+# The message appended to eventMobKillEnd if the player finished the event.
+# %POINTS%: The amount of points awarded to the player
+eventMobKillFinished: "&6You successfully finished this event and have been awarded &c%POINTS% &6points."
+# The message appended to eventMobKillEnd if the player fails the event.
+eventMobKillFailed: "&6You failed this event, you will not receive any points."
+
+# -------------------
+# EventMoveToLocation
+# -------------------
+# Message indicating the event has started
+# %LOCATION_X%: X coordinate of the finish
+# %LOCATION_Z%: Z coordinate of the finish
+eventMoveToLocationStarting: "&6Event starting now: Move to &c%LOCATION_X%&6, &c%LOCATION_Z% &6as fast as possible! You have &c%EVENT_DURATION% &6seconds!"
+# Message indicating the event has ended
+eventMoveToLocationEnded: "%6Event ended!"
+# Message for telling players who won first, second and third place
+# %PLAYER%: The name of the player
+# %POINTS%: The amount of points awarded to the player
+eventMoveToLocationFirstPlace: "&6- &c%PLAYER% &6won first place and has been awarded &c%POINTS% &6points!"
+eventMoveToLocationSecondPlace: "&6- &c%PLAYER% &6won second place and has been awarded &c%POINTS% &6points!"
+eventMoveToLocationThirdPlace: "&6- &c%PLAYER% &6won third place and has been awarded &c%POINTS% &6points!"
+# Message if no players finished
+eventMoveToLocationNoFinish: "&6No players finished. There are no winners."
+# Message to tell the player if they finished
+eventMoveToLocationFinished: "&6You finished!"

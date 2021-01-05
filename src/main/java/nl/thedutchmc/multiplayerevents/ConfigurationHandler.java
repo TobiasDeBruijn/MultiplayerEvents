@@ -22,10 +22,6 @@ public class ConfigurationHandler {
 		this.plugin = plugin;
 	}
 	
-	public FileConfiguration getConfig() {
-		return config;
-	}
-	
 	public void loadConfig() {
 		file = new File(plugin.getDataFolder(), "config.yml");
 		
@@ -43,11 +39,12 @@ public class ConfigurationHandler {
 			MultiplayerEvents.logWarn("Invalid config.yml!");
 			MultiplayerEvents.logDebug(ExceptionUtils.getStackTrace(e));
 		} catch (IOException e) {
+			MultiplayerEvents.logWarn("Unable to read config.yml due to an IOException!");
 			MultiplayerEvents.logDebug(ExceptionUtils.getStackTrace(e));
 		}
 	}
 	
-	public void readConfig() {
+	private void readConfig() {
 		//System.out.println(config.getConfigurationSection("config").getKeys(false));
 		//configOptions = config.getConfigurationSection("config").getKeys(false).stream().collect(Collectors.toMap(x -> x, config::get));
 		

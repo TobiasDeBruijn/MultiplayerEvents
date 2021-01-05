@@ -14,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import net.md_5.bungee.api.ChatColor;
 import nl.thedutchmc.multiplayerevents.ConfigurationHandler;
 import nl.thedutchmc.multiplayerevents.MultiplayerEvents;
 import nl.thedutchmc.multiplayerevents.Utils;
@@ -22,6 +21,7 @@ import nl.thedutchmc.multiplayerevents.events.EventScheduler;
 import nl.thedutchmc.multiplayerevents.events.EventState;
 import nl.thedutchmc.multiplayerevents.events.MultiplayerEvent;
 import nl.thedutchmc.multiplayerevents.events.eventmobkill.listeners.EntityDamageByEntityEventListener;
+import nl.thedutchmc.multiplayerevents.lang.LanguageHandler;
 
 /**
  * This event will challenge the player to kill n amount of some mob or animal within x amount of time
@@ -33,10 +33,12 @@ public class EventMobKill implements MultiplayerEvent {
 	
 	//Config values
 	private boolean onlyHostile;
-	private int mobKillCountLowerBound, mobKillCountUpperBound;
+	private int mobKillCountLowerBound, mobKillCountUpperBound, durationLowerBound, durationUpperBound;
+	List<String> mobBlacklist;
 	
 	public HashMap<UUID, Integer> scoreCount = new HashMap<>();
 
+	@SuppressWarnings("unchecked")
 	public EventMobKill(MultiplayerEvents plugin, EventScheduler scheduler) {		
 		this.plugin = plugin;
 		this.scheduler = scheduler;
@@ -46,13 +48,20 @@ public class EventMobKill implements MultiplayerEvent {
 		onlyHostile = (boolean) config.getConfigOption("eventMobKillHostileOnly");
 		mobKillCountLowerBound = (int) config.getConfigOption("eventMobKillCountLowerBound");
 		mobKillCountUpperBound = (int) config.getConfigOption("eventMobKillCountUpperBound");
+		mobBlacklist = (List<String>) config.getConfigOption("eventMobKillBlacklist");
+		durationLowerBound = (int) config.getConfigOption("eventMobKillCountDurationLowerBound");
+		durationUpperBound = (int) config.getConfigOption("eventMobKillCountDurationUpperBound");
 	}
 	
 	@Override
-	public boolean fireEvent() {
-		scheduler.setEventState(EventState.RUNNING);
-		
+	public boolean fireEvent() {		
 		List<EntityType> entityTypes = Arrays.asList(EntityType.values());
+		
+		//Decide on the event duration
+		int eventDuration = Utils.getRandomInt(durationLowerBound, durationUpperBound);
+		
+		MultiplayerEvents.logDebug(LanguageHandler.getLangValue("startingEventLog")
+				.replace("%EVENT_NAME%", "MobKill"));
 		
 		//Iterate over all EntityType's and filter them to LivingEntity's and/or Monsters
 		List<EntityType> filteredEntityTypes = new ArrayList<>();
@@ -74,7 +83,7 @@ public class EventMobKill implements MultiplayerEvent {
 		}
 		
 		//Get a random entity from our filtered list
-		int randomIndex = Utils.getRandomInt(0, filteredEntityTypes.size());
+		int randomIndex = Utils.getRandomInt(0, filteredEntityTypes.size() -1);
 		EntityType chosenType = filteredEntityTypes.get(randomIndex);
 		
 		//Get a random number. This is how many of the chosen entity needs to be killed by the player
@@ -96,13 +105,14 @@ public class EventMobKill implements MultiplayerEvent {
 
 		//Iterate over all Players to inform them that the event has ended
 		for(Player p : Bukkit.getOnlinePlayers()) {
-			//TODO multi language support
-
-			p.sendMessage(ChatColor.GOLD + "Event starting now: Kill " + ChatColor.RED + count + " " + typeName + ChatColor.GOLD + " within 5 minutes!");
+			p.sendMessage(LanguageHandler.getLangValue("eventMobKillStarting")
+					.replace("%MOB_COUNT%", String.valueOf(count))
+					.replace("%MOB_NAME%", typeName)
+					.replace("%EVENT_DURATION%", String.valueOf(eventDuration)));			
 		}
-		
-		MultiplayerEvents.logInfo("Event starting now: Kill " + count + " " + typeName + " within 5 minutes!");
-		
+				
+		//We put this at the end, in case an error occurs during the starting of the MultiplayerEvent
+		scheduler.setEventState(EventState.RUNNING);
 		
 		//Start a 'timer' for when the event should end.
 		new BukkitRunnable() {
@@ -111,23 +121,29 @@ public class EventMobKill implements MultiplayerEvent {
 			public void run() {
 				scheduler.setEventState(EventState.ENDING);
 				
+				MultiplayerEvents.logDebug(LanguageHandler.getLangValue("endingEventLog")
+						.replace("%EVENT_NAME%", "MobKill"));
+				
 				//Unregister the listeners for this event
 				HandlerList.unregisterAll(edbeListener);
 				
 				//Iterate over all players to inform them that the event has ended
 				Bukkit.getOnlinePlayers().forEach(player -> {	
-					//TODO formatting and multi language support required
-					if(scoreCount.containsKey(player.getUniqueId())) {
-						player.sendMessage("Event over. Your score is: " + scoreCount.get(player.getUniqueId()));
-					} else {
-						player.sendMessage("Event over. You have no score!");
-					}
+						player.sendMessage(LanguageHandler.getLangValue("eventMobKillEnded")
+								.replace("%MOB_KILL_COUNT%", ((scoreCount.containsKey(player.getUniqueId()) ? String.valueOf(scoreCount.get(player.getUniqueId())) : "0"))));
+						
+						if(scoreCount.containsKey(player.getUniqueId())) {
+							player.sendMessage(LanguageHandler.getLangValue("eventMobKillFinished")
+									.replace("%POINTS%", "")); //TODO points
+						} else {
+							player.sendMessage(LanguageHandler.getLangValue("eventMobKillFailed"));
+						}
+						
 				});
 				
 				scheduler.setEventState(EventState.WAITING);
 			}
-		}.runTaskLater(plugin, 5*60*20);
-		//TODO current event length is hardcoded at 5 minutes, should be configurable
+		}.runTaskLater(plugin, eventDuration * 20L);
 		
 		return true;
 	}

@@ -48,8 +48,7 @@ public class EventRegister {
 	 * @return Returns a random event
 	 */
 	public MultiplayerEvent getRandomEvent() {
-		int randomIndex = Utils.getRandomInt(0, events.size());
-		//TODO add check if randomIndex == 0
+		int randomIndex = Utils.getRandomInt(0, events.size() -1);
 		return events.get(randomIndex);
 	}
 }
