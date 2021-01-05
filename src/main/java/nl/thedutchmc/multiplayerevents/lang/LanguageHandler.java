@@ -3,6 +3,8 @@ package nl.thedutchmc.multiplayerevents.lang;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.ChatColor;
@@ -84,11 +86,31 @@ public class LanguageHandler {
 	}
 	
 	/**
-	 * Returns the language value associated with the provided key. Color codes have already been parsed.
+	 * Returns the language value associated with the provided key. Color codes have already been parsed.<br>
+	 * <br>
+	 * If the language value contains an array (${...}), color codes in there will not be parsed!.
 	 * @param key The key of the language value
 	 * @return Returns the language value associated with the provided key
 	 */
 	public static String getLangValue(String key) {
-		return ChatColor.translateAlternateColorCodes('&', languageValues.get(key));
+		String value = languageValues.get(key);
+		
+		Pattern pattern = Pattern.compile("(\\$\\{.*\\})");
+		Matcher matcher = pattern.matcher(value);
+		if(matcher.matches()) {
+			String[] partsSplitOnArrayStart = value.split("\\$\\{");
+			String[] partsSplitOnArrayEnd = partsSplitOnArrayStart[1].split("\\}");
+			String arrayContent = partsSplitOnArrayEnd[0];
+			
+			String partsWithoutArray = String.join("<--DELIM-->", partsSplitOnArrayStart[0], partsSplitOnArrayEnd[1]);
+			String partsWithoutArrayColorParsed = ChatColor.translateAlternateColorCodes('&', partsWithoutArray);
+			
+			String output = partsWithoutArrayColorParsed
+					.replace("<--DELIM-->", arrayContent);
+			
+			return output;
+		} else {
+			return ChatColor.translateAlternateColorCodes('&', languageValues.get(key));
+		}	
 	}
 }

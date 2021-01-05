@@ -2,6 +2,8 @@
 # Variables should NOT be translated, and put in EXACTLY like they are supposed to be, including the percentage symbols!
 # Not all variables work in all messages, only those that exist in the original English translation will work!  
 #
+# ${} indicates an array. e.g ${%VAR1% %VAR2} could produce: var1 var2, var1 var2, var1 var2 etc.
+# 
 # This file should be saved with UTF-8 encoding, otherwhise you might get weird character issues!
 #
 # General Variables:
@@ -66,3 +68,22 @@ eventMoveToLocationThirdPlace: "&6- &c%PLAYER% &6won third place and has been aw
 eventMoveToLocationNoFinish: "&6No players finished. There are no winners."
 # Message to tell the player if they finished
 eventMoveToLocationFinished: "&6You finished!"
+
+# -------------------
+# EventItemCommission
+# -------------------
+# Message indicating the event has started
+# %ITEM_NAME%: The name of the item to collect
+# %ITEM_COUNT%: The amount of the item to collect
+# %COLLECTION_X%: The X coordinate of the dropoff chest
+# %COLLECTION_Y%: The Y coordinate of the dropoff chest
+# %COLLECTION_Z%: The Z coordinate of the dropoff chest
+eventItemCommissionStarting: "&6Event starting now: Collect ${&c%ITEM_COUNT% %ITEM_NAME%&6, }&6and deliver them to a chest at &c%COLLECTION_X%&6, &c%COLLECTION_Y%&6, &c%COLLECTION_Z% &6within &c%EVENT_DURATION% &6seconds!"
+# Only one player can use the commission chest at a time, so what should we tell another player if they want to open it
+eventItemCommissionInventoryAlreadyOpen: "&6You cannot open this chest right now. Another player is already using it!"
+# Message for the player that wins
+# %POINTS%: The amount of points awarded to the player
+eventItemCommissionPlayerWon: "&6You have won the Item Commission Event! You have been awarded &c%POINTS% &6points!"
+# Message for the players that did not win or did not compete
+# %NAME%: The name of the player that won
+eventItemCommissionFinishedNonWinner: "&6The Item Commission Event has ended! &c%NAME% &6won!"

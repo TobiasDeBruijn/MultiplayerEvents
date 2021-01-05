@@ -48,9 +48,9 @@ public class EventMoveToLocation implements MultiplayerEvent {
 	
 	
 	@SuppressWarnings("unchecked")
-	public EventMoveToLocation(MultiplayerEvents plugin, EventScheduler scheduler) {
+	public EventMoveToLocation(MultiplayerEvents plugin) {
 		this.plugin = plugin;
-		this.scheduler = scheduler;
+		this.scheduler = plugin.getEventScheduler();
 		
 		//Get configuration values
 		ConfigurationHandler config = new ConfigurationHandler(plugin);
@@ -135,7 +135,6 @@ public class EventMoveToLocation implements MultiplayerEvent {
 					.replace("%LOCATION_X%", String.valueOf(finishCircleCX))
 					.replace("%LOCATION_Z%", String.valueOf(finishCircleCZ))
 					.replace("%EVENT_DURATION%", String.valueOf(eventDuration)));
-			//player.sendMessage(ChatColor.GOLD + "Event starting now: move to " + ChatColor.RED + finishCircleCX + ", " + finishCircleCZ + ChatColor.GOLD + " as fast as possible! You have " + ChatColor.RED + eventDuration + ChatColor.GOLD + " seconds!");
 		}
 		
 		//Register event listeners

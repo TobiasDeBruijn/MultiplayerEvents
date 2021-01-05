@@ -55,3 +55,64 @@ eventMoveToLocationFinishShowParticles: true
 #How long should this event last, in seconds (int)
 eventMoveToLocationDurationLowerBound: 300
 eventMoveToLocationDurationUpperBound: 900
+
+# -------------------
+# EventItemCommission
+# -------------------
+# Is the event enabled (boolean)
+eventItemCommissionCollectionEnabled: true
+# The WorldName of the world where the Chest where the collection point is (string) 
+eventItemCommissionCollectionChestWorldName: "world"
+# The X, Y and Z coordinates of the Chest where the collection point is (int)
+eventItemCommissionCollectionChestX: 0 
+eventItemCommissionCollectionChestY: 70
+eventItemCommissionCollectionChestZ: 0
+# How many different items should be required to complete this event (int)
+eventItemCommissionItemCountLowerBound: 1
+eventItemCommissionItemCountUpperBound: 10
+# What items are not allowed to be used for the commission (string list)
+eventItemCommissionItemWhitelist:
+- "apple"
+- "bread"
+- "porkchop"
+- "beef"
+- "melon_slice"
+- "chicken"
+- "carrot"
+- "rotten_flesh"
+- "spider_eye"
+- "potato"
+- "rabbit"
+- "sweet_berries"
+- "beetroot"
+- "mutton"
+- "poppy"
+- "dandelion"
+- "kelp"
+- "sugar_cane"
+- "bamboo"
+- "cactus"
+- "lily_pad"
+- "vine"
+- "rose_bush"
+- "sunflower"
+- "tnt"
+- "redstone_block"
+- "coal"
+- "charcoal"
+- "iron_ingot"
+- "gold_inot"
+- "gunpowder"
+- "wheat"
+- "slime_ball"
+- "ender_pearl"
+- "honeycomb"
+- "ice"
+- "cobblestone"
+- "oak_log"
+- "glass"
+- "book"
+- "pumpkin"
+# How long should this event last, in seconds (int)
+eventItemCommissionDurationLowerBound: 1800
+eventItemCommissionDurationUpperBound: 3600

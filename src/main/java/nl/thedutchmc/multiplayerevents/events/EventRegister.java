@@ -6,8 +6,7 @@ import java.util.List;
 import nl.thedutchmc.multiplayerevents.ConfigurationHandler;
 import nl.thedutchmc.multiplayerevents.MultiplayerEvents;
 import nl.thedutchmc.multiplayerevents.Utils;
-import nl.thedutchmc.multiplayerevents.events.eventmobkill.EventMobKill;
-import nl.thedutchmc.multiplayerevents.events.eventmovetolocation.EventMoveToLocation;
+import nl.thedutchmc.multiplayerevents.events.eventitemcommission.EventItemCommission;
 
 public class EventRegister {
 
@@ -23,15 +22,17 @@ public class EventRegister {
 	 * This method will register all default events provided by the MultiplayerEvents plugin
 	 */
 	public void registerDefaultEvents() {
-		ConfigurationHandler config = new ConfigurationHandler(plugin);
-		EventScheduler scheduler = plugin.getEventScheduler();
-		
-		if((boolean) config.getConfigOption("eventMobKillEnabled")) {
-			events.add(new EventMobKill(plugin, scheduler));
+		ConfigurationHandler config = new ConfigurationHandler(plugin);		
+		/*if((boolean) config.getConfigOption("eventMobKillEnabled")) {
+			events.add(new EventMobKill(plugin));
 		}
 		
 		if((boolean) config.getConfigOption("eventMoveToLocationEnabled")) {
-			events.add(new EventMoveToLocation(plugin, scheduler));
+			events.add(new EventMoveToLocation(plugin));
+		}*/
+		
+		if((boolean) config.getConfigOption("eventItemCommissionCollectionEnabled")) {
+			events.add(new EventItemCommission(plugin));
 		}
 	}
 	

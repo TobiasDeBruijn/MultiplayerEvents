@@ -39,9 +39,9 @@ public class EventMobKill implements MultiplayerEvent {
 	public HashMap<UUID, Integer> scoreCount = new HashMap<>();
 
 	@SuppressWarnings("unchecked")
-	public EventMobKill(MultiplayerEvents plugin, EventScheduler scheduler) {		
+	public EventMobKill(MultiplayerEvents plugin) {		
 		this.plugin = plugin;
-		this.scheduler = scheduler;
+		this.scheduler = plugin.getEventScheduler();
 		
 		//Get configuration values
 		ConfigurationHandler config = new ConfigurationHandler(plugin);		
