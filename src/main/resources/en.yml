@@ -26,12 +26,73 @@
 # &7: Gray (#AAAAAA)
 # &8: Dark Gray (#555555)
 # &0: Black (#000000)
-#
-# ----------------
-# General language
-# ----------------
+
+
+
+# +---------------+
+# |GENERAL SECTION|
+# +---------------+
+
+# The message send when an event is starting
+# %EVENT_NAME%: The name of the event
 startingEventLog: "Starting event: %EVENT_NAME%"
+
+# The message send when an event is ending
+# %EVENT_NAME%: The name of the event
 endingEventLog: "Ending event: %EVENT_NAME%"
+
+#
+# +===============+
+# |COMMAND SECTION|
+# +===============+
+
+# ----------------
+# General Messages
+# ----------------
+# The message send when a player uses a subcommand that is unknown
+noSuchPluginCommandExecutor: "&6Unknown subcommand! Please see &c/mpe help &6for available commands!"
+
+# The messag send when a player runs a command without supplying enough arguments
+notEnoughArguments: "&6Not enough arguments provided! Please see &c/mpe help &6for available commands!"
+
+# This message is send when the player supplies something that is not a positive Integer, when it should be
+commandsNotAPositiveInteger: "&6Invalid number! You must give a positive whole number."
+
+# This message is send when the player provides an invalid Player name
+# %PLAYER_NAME%: The playername provided by the user
+commandsPlayerNotFound: "&6Unknown player: &c%PLAYER_NAME%&6!"
+
+# This message is send when the user does not have permission for a command
+commandNoPermission: "&6You do not have permission to use this command."
+
+# -----------
+# /mpe reward
+# -----------
+# The message send when a player has no points
+commandRewardNoPoints: "&6You don't have any points!"
+# The message send when a player has points
+# %POINTS%: The amount of points the player has
+commandRewardPoints: "&6You have &c%POINTS% &6points!"
+# The message send for a successful /mpe reward award <player> <points>
+# %PLAYER_NAME%: The name of the player to which the points were awarded
+# %POINTS%: The amount of points awarded
+commandRewardAwardPoints: "&6Awarded &c%POINTS% &6point to &c%PLAYER_NAME%&6!"
+# The message send for a successful /mpe reward take <player> <points>
+# %PLAYER_NAME%: The name of the player frpm which the points were take
+# %POINTS%: The amount of points taken
+commandRewardTakenPoints: "&6Took &c%POINTS% &6points from &c%PLAYER_NAME%&6!"
+# The message send for a successful /mpe reward scoreboard [descending]
+# %ORDER%: Descending or Ascending. Descending by default
+commandRewardScoreboardInitial: "&6Points scoreboard in &c%ORDER%&6 order:"
+# The message format used for /mpe reward scoreboard [descending]
+# %PLAYER_NAME%: The name of the player
+# %POINTS%: The amount of points belonging to that player
+commandRewardScoreboardFormat: "&6 - &c%PLAYER_NAME% &6: &c%POINTS%"
+#
+# +=============+
+# |EVENT SECTION|
+# +=============+
+#
 
 # ------------
 # EventMobKill
@@ -59,11 +120,16 @@ eventMoveToLocationStarting: "&6Event starting now: Move to &c%LOCATION_X%&6, &c
 # Message indicating the event has ended
 eventMoveToLocationEnded: "%6Event ended!"
 # Message for telling players who won first, second and third place
+# These will be broadcasted to all players!
 # %PLAYER%: The name of the player
 # %POINTS%: The amount of points awarded to the player
 eventMoveToLocationFirstPlace: "&6- &c%PLAYER% &6won first place and has been awarded &c%POINTS% &6points!"
 eventMoveToLocationSecondPlace: "&6- &c%PLAYER% &6won second place and has been awarded &c%POINTS% &6points!"
 eventMoveToLocationThirdPlace: "&6- &c%PLAYER% &6won third place and has been awarded &c%POINTS% &6points!"
+# Message for telling the players that did not make the podium
+# This is only broadcasted to the player itself
+# %POINTS%: The amount of points awarded to the player
+eventMoveToLocationNoPodium:  "&6 You unfortunately did not make the podium. You have been awarder &c%POINTS &6points."
 # Message if no players finished
 eventMoveToLocationNoFinish: "&6No players finished. There are no winners."
 # Message to tell the player if they finished

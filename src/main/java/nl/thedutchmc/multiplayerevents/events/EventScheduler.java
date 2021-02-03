@@ -4,7 +4,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import nl.thedutchmc.multiplayerevents.ConfigurationHandler;
 import nl.thedutchmc.multiplayerevents.MultiplayerEvents;
-import nl.thedutchmc.multiplayerevents.Utils;
+import nl.thedutchmc.multiplayerevents.utils.Utils;
 
 public class EventScheduler {
 	
@@ -22,10 +22,16 @@ public class EventScheduler {
 		eventState = EventState.WAITING;
 		
 		int delay = Utils.getRandomInt(eventIntervalLowerBound, eventIntervalUpperBound);
-		scheduleNextEvent(delay);
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				scheduleNextEvent(delay);
+			}
+		}.runTaskLater(plugin, 1);
 	}
 	
-	private void scheduleNextEvent(long delay) {
+	public void scheduleNextEvent(long delay) {
 		
 		//If an event is already running we do not want to start a new one
 		//so we just wait another cycle

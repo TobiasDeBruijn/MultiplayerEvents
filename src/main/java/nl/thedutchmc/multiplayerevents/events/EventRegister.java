@@ -1,12 +1,15 @@
 package nl.thedutchmc.multiplayerevents.events;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import nl.thedutchmc.multiplayerevents.ConfigurationHandler;
 import nl.thedutchmc.multiplayerevents.MultiplayerEvents;
-import nl.thedutchmc.multiplayerevents.Utils;
-import nl.thedutchmc.multiplayerevents.events.eventitemcommission.EventItemCommission;
+import nl.thedutchmc.multiplayerevents.annotations.RegisterMultiplayerEvent;
+import nl.thedutchmc.multiplayerevents.utils.ReflectionUtils;
+import nl.thedutchmc.multiplayerevents.utils.Utils;
 
 public class EventRegister {
 
@@ -19,20 +22,42 @@ public class EventRegister {
 	}
 	
 	/**
-	 * This method will register all default events provided by the MultiplayerEvents plugin
+	 * Find all events annotated with {@link RegisterMultiplayerEvent} and register them if they are enabled
 	 */
-	public void registerDefaultEvents() {
-		ConfigurationHandler config = new ConfigurationHandler(plugin);		
-		/*if((boolean) config.getConfigOption("eventMobKillEnabled")) {
-			events.add(new EventMobKill(plugin));
-		}
+	public void discoverAndRegisterEvents() {
 		
-		if((boolean) config.getConfigOption("eventMoveToLocationEnabled")) {
-			events.add(new EventMoveToLocation(plugin));
-		}*/
-		
-		if((boolean) config.getConfigOption("eventItemCommissionCollectionEnabled")) {
-			events.add(new EventItemCommission(plugin));
+		List<String> annotatedClasses = plugin.getAnnotatedClasses(RegisterMultiplayerEvent.class);
+		if(annotatedClasses != null) {
+			
+			ConfigurationHandler config = new ConfigurationHandler(plugin);
+			
+			//Loop over all classes found
+			for(String s : annotatedClasses) {
+				Class<?> clazz = ReflectionUtils.getClass(s);
+				
+				//Get all interfaces that the class implements, and check that it implements MultiplayerEvent
+				List<Class<?>> interfaces = Arrays.asList(clazz.getInterfaces());
+				if(!interfaces.contains(MultiplayerEvent.class)) {
+					throw new RuntimeException("Class annotated with RegisterMultiplayerEvent but does not implement MultiplayerEvent");
+				}
+				
+				//Get the constructor and instantiate the class
+				Constructor<?> constructor = ReflectionUtils.getConstructor(clazz, MultiplayerEvents.class);
+				MultiplayerEvent clazzInstance = (MultiplayerEvent) ReflectionUtils.createInstance(constructor, this.plugin);
+				
+				//Get if we should enable the event
+				Boolean shouldEnable = (Boolean) config.getConfigOption(clazzInstance.getEnabledConfigOptionName());
+				if(shouldEnable == null) {
+					throw new RuntimeException("Configuration option " + clazzInstance.getEnabledConfigOptionName() + " for " + clazz.getCanonicalName() + " not found!");
+				}
+				
+				MultiplayerEvents.logDebug("Discovered " + clazz.getCanonicalName() + ". " + ((shouldEnable) ? "Enabling event" : "Not enabling because it is not enabled in the config."));
+				
+				//If we should enable it, add it to the list of events
+				if(shouldEnable) {
+					this.events.add(clazzInstance);
+				}
+			}
 		}
 	}
 	

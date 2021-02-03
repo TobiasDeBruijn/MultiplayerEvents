@@ -23,14 +23,16 @@ import org.bukkit.scheduler.BukkitTask;
 
 import nl.thedutchmc.multiplayerevents.ConfigurationHandler;
 import nl.thedutchmc.multiplayerevents.MultiplayerEvents;
-import nl.thedutchmc.multiplayerevents.Utils;
+import nl.thedutchmc.multiplayerevents.annotations.RegisterMultiplayerEvent;
 import nl.thedutchmc.multiplayerevents.events.EventScheduler;
 import nl.thedutchmc.multiplayerevents.events.EventState;
 import nl.thedutchmc.multiplayerevents.events.MultiplayerEvent;
 import nl.thedutchmc.multiplayerevents.events.eventitemcommission.listeners.InventoryCloseEventListener;
 import nl.thedutchmc.multiplayerevents.events.eventitemcommission.listeners.InventoryOpenEventListener;
 import nl.thedutchmc.multiplayerevents.lang.LanguageHandler;
+import nl.thedutchmc.multiplayerevents.utils.Utils;
 
+@RegisterMultiplayerEvent
 public class EventItemCommission implements MultiplayerEvent {
 
 	private MultiplayerEvents plugin;
@@ -38,7 +40,7 @@ public class EventItemCommission implements MultiplayerEvent {
 	
 	//Config values
 	private Location collectionChestLocation;
-	private int itemCountLowerBound, itemCountUpperBound, durationLowerBound, durationUpperBound;
+	private int itemCountLowerBound, itemCountUpperBound, durationLowerBound, durationUpperBound, rewardLowerBound, rewardUpperBound;
 	private List<Material> allowedItems = new ArrayList<>();
 	
 	private List<ItemStack> collectionChestContents = new ArrayList<>();
@@ -75,6 +77,10 @@ public class EventItemCommission implements MultiplayerEvent {
 		itemCountLowerBound = (int) config.getConfigOption("eventItemCommissionItemCountLowerBound");
 		itemCountUpperBound = (int) config.getConfigOption("eventItemCommissionItemCountUpperBound");
 		
+		//Get the reward points bounds
+		rewardLowerBound = (int) config.getConfigOption("eventItemCommissionRewardLowerBound");
+		rewardUpperBound = (int) config.getConfigOption("eventItemCommissionRewardUpperBound");
+		
 		//Iterate over all Materials to get a List of Materials that matches the filter provided by the user
 		List<String> strAllowedItems = (List<String>) config.getConfigOption("eventItemCommissionItemWhitelist");
 		for(Material m : Material.values()) {
@@ -84,6 +90,11 @@ public class EventItemCommission implements MultiplayerEvent {
 		//Get the event duration bounds
 		durationLowerBound = (int) config.getConfigOption("eventItemCommissionDurationLowerBound");
 		durationUpperBound = (int) config.getConfigOption("eventItemCommissionDurationUpperBound");
+	}
+	
+	@Override
+	public String getEnabledConfigOptionName() {
+		return "eventItemCommissionCollectionEnabled";
 	}
 	
 	@Override
@@ -222,8 +233,12 @@ public class EventItemCommission implements MultiplayerEvent {
 	}
 	
 	public void finishEvent(Player playerWhoWon) {
+		int possiblePoints = Utils.getRandomInt(this.rewardLowerBound, this.rewardUpperBound);
+		
+		this.plugin.getRewardManager().awardPoints(playerWhoWon.getUniqueId(), possiblePoints);
+		
 		playerWhoWon.sendMessage(LanguageHandler.getLangValue("eventItemCommissionPlayerWon")
-				.replace("%POINTS%", "")); //TODO points
+				.replace("%POINTS%", String.valueOf(possiblePoints)));
 		
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			if(p.equals(playerWhoWon)) continue;

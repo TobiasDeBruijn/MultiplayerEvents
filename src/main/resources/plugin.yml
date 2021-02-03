@@ -3,3 +3,28 @@ main: @groupId@.@mainClassName@
 version: @version@
 author: @author@
 api-version: @apiVersion@
+load: STARTUP
+
+commands:
+  mpe:
+    description: MultiplayerEvents base command
+    usage: /mpe <subcommand> <options>
+
+permissions:
+  mpe.basic:
+    default: true
+    children:
+      mpe.help: true
+      mpe.reward: true
+      mpe.reward.scoreboard: true
+
+  mpe.admin:
+    default: op
+    children:
+      mpe.basic: true
+      mpe.reward.all: true
+
+  mpe.reward.all:
+    children:
+      mpe.reward.award: true
+      mpe.reward.take: true

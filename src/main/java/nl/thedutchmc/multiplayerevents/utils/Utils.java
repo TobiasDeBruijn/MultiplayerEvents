@@ -1,5 +1,8 @@
-package nl.thedutchmc.multiplayerevents;
+package nl.thedutchmc.multiplayerevents.utils;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -146,4 +149,40 @@ public class Utils {
 	public static double getDistanceCylindrical(Location locationA, Location locationB) {
 		return Math.pow((locationA.getX() - locationB.getX()), 2) + Math.pow((locationA.getZ() - locationB.getZ()), 2);
 	}
+	
+	/**
+	 * Get the Stacktrace from a Throwable
+	 * @param throwable The Throwable to get the Stacktrace from
+	 * @return Returns the Stacktrace
+	 */
+    public static String getStackTrace(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw, true);
+        throwable.printStackTrace(pw);
+        return sw.getBuffer().toString();
+    }
+    
+    /**
+     * Verify if a String is a positive number, less than Integer.MAX_VALUE
+     * @param input The input to verify
+     * @param senderChannel The TextChannel to send output to
+     * @return Returns true if the provided String is a valid positive Integer
+     */
+    public static boolean verifyPositiveInteger(String input) {
+		if(input.matches("-?\\d+")) {
+			
+			BigInteger bigInt = new BigInteger(input);
+			if(bigInt.compareTo(BigInteger.valueOf((long) Integer.MAX_VALUE)) > 0) {
+				return false;
+			}
+			
+			if(Integer.valueOf(input) <= 0) {
+				return false;
+			}
+		} else {
+			return false;
+		}
+		
+		return true;
+    }
 }

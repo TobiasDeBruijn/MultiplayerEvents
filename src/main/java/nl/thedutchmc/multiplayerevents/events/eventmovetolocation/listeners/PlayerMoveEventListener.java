@@ -6,8 +6,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import nl.thedutchmc.multiplayerevents.Utils;
 import nl.thedutchmc.multiplayerevents.events.eventmovetolocation.EventMoveToLocation;
+import nl.thedutchmc.multiplayerevents.utils.Utils;
 
 public class PlayerMoveEventListener implements Listener {
 

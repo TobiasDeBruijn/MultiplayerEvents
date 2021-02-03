@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -15,6 +14,7 @@ import com.google.common.io.Files;
 
 import nl.thedutchmc.multiplayerevents.ConfigurationHandler;
 import nl.thedutchmc.multiplayerevents.MultiplayerEvents;
+import nl.thedutchmc.multiplayerevents.utils.Utils;
 
 public class LanguageHandler {
 
@@ -54,7 +54,7 @@ public class LanguageHandler {
 				Files.move(tmpFileLocation, file);
 			} catch (IOException e) {
 				MultiplayerEvents.logWarn("Unable to move en.yml due to an IOException!");
-				MultiplayerEvents.logDebug(ExceptionUtils.getStackTrace(e));
+				MultiplayerEvents.logDebug(Utils.getStackTrace(e));
 			}	
 		} else {
 			if(!file.exists()) {
@@ -71,10 +71,10 @@ public class LanguageHandler {
 			readConfig();
 		} catch (InvalidConfigurationException e) {
 			MultiplayerEvents.logWarn(language + ".yml is invalid!");
-			MultiplayerEvents.logDebug(ExceptionUtils.getStackTrace(e));
+			MultiplayerEvents.logDebug(Utils.getStackTrace(e));
 		} catch (IOException e) {
 			MultiplayerEvents.logWarn("Unable to read " + language + ".yml due to an IOException!");
-			MultiplayerEvents.logDebug(ExceptionUtils.getStackTrace(e));
+			MultiplayerEvents.logDebug(Utils.getStackTrace(e));
 		}
 	}
 	

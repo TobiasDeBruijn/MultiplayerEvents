@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+
+import nl.thedutchmc.multiplayerevents.annotations.Nullable;
+import nl.thedutchmc.multiplayerevents.utils.Utils;
 
 public class ConfigurationHandler {
 
@@ -37,10 +39,10 @@ public class ConfigurationHandler {
 			readConfig();
 		} catch (InvalidConfigurationException e) {
 			MultiplayerEvents.logWarn("Invalid config.yml!");
-			MultiplayerEvents.logDebug(ExceptionUtils.getStackTrace(e));
+			MultiplayerEvents.logDebug(Utils.getStackTrace(e));
 		} catch (IOException e) {
 			MultiplayerEvents.logWarn("Unable to read config.yml due to an IOException!");
-			MultiplayerEvents.logDebug(ExceptionUtils.getStackTrace(e));
+			MultiplayerEvents.logDebug(Utils.getStackTrace(e));
 		}
 	}
 	
@@ -54,6 +56,7 @@ public class ConfigurationHandler {
 		}
 	}
 	
+	@Nullable
 	public Object getConfigOption(String optionName) {
 		return configOptions.get(optionName);
 	}

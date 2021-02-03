@@ -1,5 +1,6 @@
 package nl.thedutchmc.multiplayerevents.events.eventmovetolocation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,23 +14,26 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import net.md_5.bungee.api.ChatColor;
 import nl.thedutchmc.multiplayerevents.ConfigurationHandler;
 import nl.thedutchmc.multiplayerevents.MultiplayerEvents;
-import nl.thedutchmc.multiplayerevents.Utils;
+import nl.thedutchmc.multiplayerevents.annotations.RegisterMultiplayerEvent;
 import nl.thedutchmc.multiplayerevents.events.EventScheduler;
 import nl.thedutchmc.multiplayerevents.events.EventState;
 import nl.thedutchmc.multiplayerevents.events.MultiplayerEvent;
 import nl.thedutchmc.multiplayerevents.events.eventmovetolocation.listeners.PlayerMoveEventListener;
 import nl.thedutchmc.multiplayerevents.lang.LanguageHandler;
+import nl.thedutchmc.multiplayerevents.utils.Utils;
 
 /**
  * This event will challenge the player to move to a location as fast as possible
  */
 @SuppressWarnings("unused") //For unimplemented features
+@RegisterMultiplayerEvent
 public class EventMoveToLocation implements MultiplayerEvent {
 
 	private MultiplayerEvents plugin;
@@ -37,7 +41,8 @@ public class EventMoveToLocation implements MultiplayerEvent {
 	
 	//Config values
 	private boolean enableMobs, enableFinishParticles;
-	private int distanceLowerBound, distanceUpperBound, finishRadius, durationLowerBound, durationUpperBound;
+	private int distanceLowerBound, distanceUpperBound, finishRadius, durationLowerBound, durationUpperBound, rewardsLowerBound, rewardsUpperBound;
+	private double secondPlaceModifier, thirdPlaceModifier, noPodiumModifier;
 	private List<String> mobWhitelist;
 	
 	private final int particleHeight = 15;
@@ -46,6 +51,7 @@ public class EventMoveToLocation implements MultiplayerEvent {
 	private HashMap<UUID, BukkitTask> particleTasks = new HashMap<>();
 	private List<Player> finishedPlayers = new LinkedList<>();
 	
+	private List<Listener> listeners = new ArrayList<>();
 	
 	@SuppressWarnings("unchecked")
 	public EventMoveToLocation(MultiplayerEvents plugin) {
@@ -61,8 +67,19 @@ public class EventMoveToLocation implements MultiplayerEvent {
 		finishRadius = (int) config.getConfigOption("eventMoveToLocationFinishRadius");
 		durationLowerBound = (int) config.getConfigOption("eventMoveToLocationDurationLowerBound");
 		durationUpperBound = (int) config.getConfigOption("eventMoveToLocationDurationUpperBound");
+		rewardsLowerBound = (int) config.getConfigOption("eventMoveToLocationRewardLowerBound");
+		rewardsUpperBound = (int) config.getConfigOption("eventMoveToLocationRewardUpperBound");
+		secondPlaceModifier = (double) config.getConfigOption("eventMoveToLocationRewardSecondMultiplier");
+		thirdPlaceModifier = (double) config.getConfigOption("eventMoveToLocationRewardThirdMultiplier");
+		noPodiumModifier = (double) config.getConfigOption("eventMoveToLocatioNoPodiumModifier");
+		
 		
 		mobWhitelist = (List<String>) config.getConfigOption("eventMoveToLocationMobWhitelist");
+	}
+	
+	@Override
+	public String getEnabledConfigOptionName() {
+		return "eventMoveToLocationEnabled";
 	}
 	
 	@Override
@@ -151,51 +168,105 @@ public class EventMoveToLocation implements MultiplayerEvent {
 			
 			@Override
 			public void run() {
-				scheduler.setEventState(EventState.ENDING);
-				
-				MultiplayerEvents.logDebug(LanguageHandler.getLangValue("endingEventLog")
-						.replace("%EVENT_NAME%", "MoveToLocation"));
-				
-				//Cancel all particle tasks
-				particleTasks.forEach((uuid, task) -> {
-					task.cancel();
-				});
-				
-				//Unregister event listeners
-				HandlerList.unregisterAll(pmeListener);
-				
-				//Inform all players that the event has ended, and tell the fast players
-				for(Player p : Bukkit.getOnlinePlayers()) {					
-					p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationEnded"));
-					
-					if(finishedPlayers.size() != 0) {
-						if(finishedPlayers.size() >= 1) {
-							p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationFirstPlace")
-									.replace("%PLAYER%", finishedPlayers.get(0).getDisplayName())
-									.replace("%POINTS%", "")); //TODO points
-						}
-						
-						if(finishedPlayers.size() >= 2) {
-							p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationFirstPlace")
-									.replace("%PLAYER%", finishedPlayers.get(1).getDisplayName())
-									.replace("%POINTS%", "")); //TODO points						
-						}
-						
-						if(finishedPlayers.size() >= 3) {
-							p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationFirstPlace")
-									.replace("%PLAYER%", finishedPlayers.get(2).getDisplayName())
-									.replace("%POINTS%", "")); //TODO points						
-						}
-					} else {
-						p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationNoFinish"));
-					}
-				}
-				
-				scheduler.setEventState(EventState.WAITING);
+				eventFinished();
 			}
 		}.runTaskLater(plugin, eventDuration * 20L);
 		
 		return true;
+	}
+	
+	private void eventFinished() {
+		//EventState to ending
+		scheduler.setEventState(EventState.ENDING);
+		
+		MultiplayerEvents.logDebug(LanguageHandler.getLangValue("endingEventLog")
+				.replace("%EVENT_NAME%", "MoveToLocation"));
+		
+		//Cancel all particle tasks
+		particleTasks.forEach((uuid, task) -> {
+			task.cancel();
+		});
+		
+		//Unregister event listeners
+		this.listeners.forEach(eventListener -> {
+			HandlerList.unregisterAll(eventListener);
+		});
+		
+		//Calculate the amount of possible points
+		int possiblePoints = Utils.getRandomInt(this.rewardsLowerBound, this.rewardsUpperBound);
+		
+		//Calculate the amount of points awarded to each podium spot
+		//Calculated: placeModifier * possiblePoints, rounded to the nearest integer
+		int secondPlacePoints = (int) Math.round(this.secondPlaceModifier * possiblePoints);
+		int thirdPlacePoints = (int) Math.round(this.thirdPlaceModifier * possiblePoints);
+		int noPodiumPoints = (int) Math.round(this.noPodiumModifier * possiblePoints);
+		
+		//If there's a winner, give the winner their points
+		if(finishedPlayers.size() >= 1) {
+			this.plugin.getRewardManager().awardPoints(finishedPlayers.get(0).getUniqueId(), possiblePoints);
+		}
+		
+		//If there's a second place, award them their points
+		if(finishedPlayers.size() >= 2) {
+			this.plugin.getRewardManager().awardPoints(finishedPlayers.get(1).getUniqueId(), secondPlacePoints);
+		}
+		
+		//If there's a third place, award them their points
+		if(finishedPlayers.size() >= 3) {
+			this.plugin.getRewardManager().awardPoints(finishedPlayers.get(2).getUniqueId(), thirdPlacePoints);
+		}
+		
+		//Inform all players that the event has ended, and tell the fast players
+		for(Player p : Bukkit.getOnlinePlayers()) {					
+			p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationEnded"));
+			
+			//If there's a winner
+			if(finishedPlayers.size() != 0) {
+				
+				//There is a first place winner, broadcast the message
+				if(finishedPlayers.size() >= 1) {
+					p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationFirstPlace")
+							.replace("%PLAYER%", finishedPlayers.get(0).getDisplayName())
+							.replace("%POINTS%", String.valueOf(possiblePoints)));
+				}
+				
+				//There is a second place winner, broadcast the message
+				if(finishedPlayers.size() >= 2) {
+					p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationSecondPlace")
+							.replace("%PLAYER%", finishedPlayers.get(1).getDisplayName())
+							.replace("%POINTS%", String.valueOf(secondPlacePoints)));					
+				}
+				
+				//There is a third place winner, broadcast the winner
+				if(finishedPlayers.size() >= 3) {
+					p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationThirdPlace")
+							.replace("%PLAYER%", finishedPlayers.get(2).getDisplayName())
+							.replace("%POINTS%", String.valueOf(thirdPlacePoints)));			
+				}
+			} else {
+				//There were no winners
+				p.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationNoFinish"));
+			}
+		}
+		
+		//There are winners who did not make the podium
+		if(finishedPlayers.size() >= 4) {
+			
+			//Get the list of those that did not make the podium
+			List<Player> noPodiumFinishedPlayers = finishedPlayers.subList(3, finishedPlayers.size());
+			noPodiumFinishedPlayers.forEach(player -> {
+				//Award the player their reward
+				this.plugin.getRewardManager().awardPoints(player.getUniqueId(), noPodiumPoints);
+				
+				//Tell the player what they got
+				player.sendMessage(LanguageHandler.getLangValue("eventMoveToLocationNoPodium")
+						.replace("%PLAYER%", player.getDisplayName())
+						.replace("%POINTS%", String.valueOf(noPodiumPoints)));
+			});
+		}
+		
+		//EventState back to waiting
+		scheduler.setEventState(EventState.WAITING);
 	}
 	
 	public Location getFinishLocationFor(UUID uuid) {

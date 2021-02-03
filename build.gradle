@@ -1,8 +1,10 @@
 import org.apache.tools.ant.filters.ReplaceTokens
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id 'java'
     id 'eclipse'
+    id 'com.github.johnrengelman.shadow' version '5.0.0'    
 }
 
 allprojects {
@@ -37,30 +39,46 @@ dependencies {
 	compileOnly 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
 	
 	//Apache Commons IO
-	compile 'commons-io:commons-io:2.6'
+	compileOnly 'commons-io:commons-io:2.6'
+	
+	//ClassIndex annotation processor
+	compile('org.atteo.classindex:classindex:3.4')
+	annotationProcessor('org.atteo.classindex:classindex:3.4')
 }
 
-task testJar(type: Jar) {
+task testJar(type: ShadowJar) {
 	description 'Build a test Jar'
 	archiveClassifier = 'DEV'
+	
 	from sourceSets.main.output
+	configurations = [project.configurations.runtime]
+	
+	mergeServiceFiles {
+    	path = 'META-INF/annotations'
+  	}
+	
 	destinationDirectory = file("$rootDir/server/plugins")
 }
 
-task releaseJar(type: Jar) {
+task releaseJar(type: ShadowJar) {
 	description 'Build a release Jar'
 	archiveClassifier = 'RELEASE'
+	
 	from sourceSets.main.output
+	configurations = [project.configurations.runtime]
+	
 	destinationDirectory = file("$rootDir/releases")
 }
 
 //This task is for GitHub Actions only
-task ghActions(type: Jar) {	
+task ghActions(type: ShadowJar) {	
 	description 'GitHub Actions Task. Do not use in regular development!'
 	version = ''
 	archiveClassifier = ''
 	archiveBaseName = 'output'
 	
 	from sourceSets.main.output
+	configurations = [project.configurations.runtime]
+	
 	destinationDirectory = file("$rootDir/actions")
 }

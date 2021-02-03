@@ -31,6 +31,13 @@ eventMobKillCountUpperBound: 10
 #How long should this event last, in seconds (int)
 eventMobKillCountDurationLowerBound: 300
 eventMobKillCountDurationUpperBound: 900
+#How many points should the player get, inclusive (int)
+eventMobKillCountRewardLowerBound: 5
+eventMobKillCountRewardUpperBound: 20
+#Modifier applied per mob that a player didn't kill (float)
+#E.g when they need to kill 10 mobs, but they only killed 5, this multiplier is applied to itself 5 times and then to the final amount of points
+#E.g: Multiplier = 0.9, with the example above would give (0.9)^5 multiplied by the amount of points they can get
+eventMobKillCountRewardMultiplier: 0.9
 
 # -------------------
 # EventMoveToLocation
@@ -40,6 +47,7 @@ eventMoveToLocationEnabled: true
 #Should mobs be spawned to make it trickier for the player (boolean)
 eventMoveToLocationEnableMobs: true
 #What mobs should be spawned, if enabled (string list)
+#Do not include the minecraft: prefix. Lower case only!
 eventMoveToLocationMobWhitelist:
 - "zombie"
 - "skeleton"
@@ -55,6 +63,15 @@ eventMoveToLocationFinishShowParticles: true
 #How long should this event last, in seconds (int)
 eventMoveToLocationDurationLowerBound: 300
 eventMoveToLocationDurationUpperBound: 900
+#How many points should the winner get, inclusive (int)
+eventMoveToLocationRewardLowerBound: 1
+eventMoveToLocationRewardUpperBound: 5
+#Multiplier for second and third place (float)
+eventMoveToLocationRewardSecondMultiplier: 0.7
+eventMoveToLocationRewardThirdMultiplier: 0.5
+#Multiplier for those that did not make the podium (float)
+eventMoveToLocatioNoPodiumModifier: 0.3
+
 
 # -------------------
 # EventItemCommission
@@ -116,3 +133,6 @@ eventItemCommissionItemWhitelist:
 # How long should this event last, in seconds (int)
 eventItemCommissionDurationLowerBound: 1800
 eventItemCommissionDurationUpperBound: 3600
+#How many points should the winner get, inclusive (int)
+eventItemCommissionRewardLowerBound: 20
+eventItemCommissionRewardUpperBound: 50
